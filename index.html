@@ -242,7 +242,7 @@ disco ^? consulHost . ix 0 . to T.toUpper
 
 # ^? works over Maybe type, here Maybe Text
 Just "CRITEO" <> Just " go Go GO"
-> Just "CRITEO"
+> Just "CRITEO go Go GO"
 Nothing <> Just " go Go GO"
 > Just " go Go GO"
 ```
