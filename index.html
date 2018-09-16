@@ -28,552 +28,100 @@
 
         <section data-markdown>
           <textarea data-template>
+
             # Haskell Paris
-            ### Usage Overview of Lens/Prism
+            ### How to start learning haskell
 
-            slides at https://github.com/erebe/haskell-paris-29-11-2017
+            <img src="https://secure.meetupstatic.com/photos/event/c/3/8/e/global_185750062.jpeg"/>
 
-            29/11/2017 - Romain GERARD
+            slides at https://github.com/erebe/haskell-paris-17-09-2018
+
+            17/09/2018 - Romain GERARD - SRE at Criteo
+          </textarea>
+        </section>
+
+        <section data-markdown>
+          <textarea data-template>
+            ### Why do you want to learn Haskell ?
+
+            * To impress ?
+            * To tackle a challenge ?
+            * To see something different ?
+            * To atteign enlightment ?
+
+            Be ware of your motivations in order to not lost it half-way
 
           </textarea>
         </section>
 
         <section data-markdown>
           <textarea data-template>
-            ### This is not about how to implement Lens
-
-            * [History of Lens](https://github.com/ekmett/lens/wiki/History-of-Lenses)
-            * [Write your lens tutorial](http://www.mchaver.com/posts/2017-07-12-lens-tutorial-1.html)
-            * [Lens Over Tea](https://artyom.me/#lens-over-tea)
-
+            ## Where does the difficulties come from ?
           </textarea>
         </section>
 
         <section data-markdown>
           <textarea data-template>
-            ### This is about advertising Lens
+            ### The communities have conflicting interests
 
-            * Be less scary
-            * Get more adoption
-            * See more library providing lens
+            * Research/Academic Area
+              * Category Theory for Programmers - Bartosz Milewski
+            * Groups targeting the industry
+              * FpComplete - Well-Typed - Tweag I/O
+            * People just wanting to learn it
           </textarea>
         </section>
 
         <section data-markdown>
           <textarea data-template>
-            ### What are Lens in practice ?
+            ### Haskell is old - 28 year old
 
-            * A way to get back sanity when updating records <!-- .element: class="fragment" data-fragment-index="1" -->
-```haskell
-   data User = User { name :: String, age :: Int }
-   data Project = Project { owner :: User }
-```
-<!-- .element: class="fragment" data-fragment-index="2" -->
-```haskell
-  setOwnerName :: String -> Project -> Project
-  setOwnerName newName p = p {
-          owner = (owner p) { name = newName }
-  }
-```
-<!-- .element: class="fragment" data-fragment-index="3" -->
-            * What we want is <!-- .element: class="fragment" data-fragment-index="4" -->
-```Haskell
-    project.owner.name = "John"
-```
-            * What Lens offers us is  <!-- .element: class="fragment" data-fragment-index="5" -->
-```Haskell
-  set (owner.name) "John" project
-  # Or
-  project & owner.name .~ "John"
-```
+            * A lot of outdated learning materials
+              * Haskell Book - Haskell programming from first principles
+              * Haskell Wiki Book - https://en.wikibooks.org/wiki/Haskell
+              * What I Wish I Knew When Learning Haskell
+
+            * Language has a lot of quirks
+              * Strings/ByteString/Text and all Lazy variants
+              * Freaking number of extensions (Hello mandatory ScopedTypeVariables)
+              * Prelude is a bad STL - pick protolude
+
+            * Conflicting styles
+              * MTL vs Free Monads
+              * Let's make everything a funky operator
+              * Dependent Types
+              * Lens
           </textarea>
         </section>
 
         <section data-markdown>
           <textarea data-template>
-            #### Lens are unidiomatic in Haskell
-            ![](images/learning_curve.jpg)
-          </textarea>
-        </section>
-        <section data-markdown>
-          <textarea data-template>
-            #### Lens are unidiomatic in Haskell
-            ![](images/lens_deps.png)
-          </textarea>
-        </section>
+            ### The Strong Type System
 
-        <section data-markdown>
-					<textarea data-template>
-						### So I made a choice
-
-						- MicroLens - https://github.com/aelve/microlens
-
-						```yaml
-build-depends:    protolude # Base/Prelude replacement
-                , base # Not necessary to build, for repl
-                , microlens-platform
-                , transformers # To get MonadReader
-                , text
-            ```
-					</textarea>
-        </section>
-        <section data-markdown>
-          <textarea data-template>
-            ### Let's get started !
-
-            * I have a record, how do I get my Lens ? <!-- .element: class="fragment" data-fragment-index="1" -->
-```Haskell
-data ConsulDiscovery = ConsulDiscovery
-{ consulHost           :: [Text]
-, consulPort           :: Int
-, consulTimeout        :: Int
-, consulReadConsistency :: Text
-} deriving (Show)
-```
-            * Simply rewrite it into  <!-- .element: class="fragment" data-fragment-index="2" -->
-```Haskell
-  {-# LANGUAGE TemplateHaskell #-}
-  import Lens.Micro.Platform
-```
-```Haskell
-  data ConsulDiscovery = ConsulDiscovery
-  { _consulHost           :: [Text]
-  , _consulPort           :: Int
-  , _consulTimeout        :: Int
-  , _consulReadConsistency :: Text
-  } deriving (Show)
-```
-```Haskell
-  makeLenses ''ConsulDiscovery
-```
-            * Voilà !  <!-- .element: class="fragment" data-fragment-index="3" -->
+            * You have to understand it
+              * Be ready to be masochist and bang your head on it
+            * It add an other layer of lecture - Types
+              * Code can make no sense if you don't understand its types
+              * You have to know Haskell basic type hierarchie (Monoid/Foldable/Traversable/Applicative/Monad)
+            * It can feel hard without necessity
+              * You start to appreciate it when you master it
           </textarea>
         </section>
 
         <section data-markdown>
           <textarea data-template>
-```shell
-$ stack repl
-```
+            ### Practical Advises
 
-```Haskell
-*Main> :t consulHost
-consulHost
-  :: Functor f =>
-     (Text -> f Text) -> ConsulDiscovery -> f ConsulDiscovery
-```
-
-```Haskell
-*Main> :info consulHost
-consulHost :: Lens' ConsulDiscovery Text
--- Defined at /home/erebe/progs/haskell/talk/app/Main.hs:45:1
-						```
-          </textarea>
-        </section>
-        <section data-markdown>
-          <textarea data-template>
-### view/getter 1/3
-
-```Haskell
-import Lens.Micro.Platform
-import qualified Data.Text as T
-let disco = ConsulDiscovery
-  ["consul.criteo.prod", "consul2.criteo.prod"] 8500 10 "STALE"
-```
-<!-- .element: class="fragment" data-fragment-index="1" -->
-
-```Haskell
-view consulPort disco
-> 8500
-# OR
-disco ^. consulPort
-> 8500
-```
-<!-- .element: class="fragment" data-fragment-index="2" -->
-
-```Haskell
-# You can compose Lenses !
-disco ^. consulHost . ix 0
-> "consul.criteo.prod"
-
-# `to` transform any function into a Lens
-disco ^. consulHost . ix 0 . to T.toUpper
-> "CONSUL.CRITEO.PROD"
-```
-<!-- .element: class="fragment" data-fragment-index="3" -->
-
+            * You have to understand it
+              * Be ready to be masochist and bang your head on it
+            * It add an other layer of lecture - Types
+              * Code can make no sense if you don't understand its types
+              * You have to know Haskell basic type hierarchie (Monoid/Foldable/Traversable/Applicative/Monad)
+            * It can feel hard without necessity
+              * You start to appreciate it when you master it
           </textarea>
         </section>
 
-        <section data-markdown>
-          <textarea data-template>
-### view/getter 2/3
-
-```Haskell
-# Beware of the Monoid !
-disco ^. consulHost . ix 42
-> ""
-```
-<!-- .element: class="fragment" data-fragment-index="1" -->
-
-```Haskell
-disco ^? consulHost . ix 42
-> Nothing
-```
-<!-- .element: class="fragment" data-fragment-index="2" -->
-
-```Haskell
-# ^? is the operator for `Get Maybe` or `Get if it exists`
-disco ^? consulHost . ix 42 . to T.toUpper
-> Nothing
-
-disco ^. consulHost . ix 42 . to T.toUpper
-> ""
-
-disco ^? consulHost . ix 0 . to T.toUpper
-> Just "CONSUL.CRITEO.PROD"
-```
-<!-- .element: class="fragment" data-fragment-index="3" -->
-
-```Haskell
-# ^. works over the raw type, here Text
-"CRITEO" <> " go Go GO"
-> "CRITEO go Go GO"
-
-# ^? works over Maybe type, here Maybe Text
-Just "CRITEO" <> Just " go Go GO"
-> Just "CRITEO go Go GO"
-Nothing <> Just " go Go GO"
-> Just " go Go GO"
-```
-<!-- .element: class="fragment" data-fragment-index="4" -->
-          </textarea>
-        </section>
-
-        <section data-markdown>
-          <textarea data-template>
-### view/getter 3/3
-```Haskell
-# Hosts to csv
-disco ^. (consulHost . ix 0 <> to (const ";") <> consulHost . ix 1)
-> "consul.criteo.prod;consul2.criteo.prod"
-
-# to InetAddress
-disco ^. (consulHost . ix 0 <> to (const ":") <> consulPort . to show)
-> "consul.criteo.prod:8500"
-```
-<!-- .element: class="fragment" data-fragment-index="1" -->
-          </textarea>
-        </section>
-
-        <section data-markdown>
-          <textarea data-template>
-### What have we seen so far
-
-Name | Operator | Description
------|----------|------------
-makeLenses |    | auto-generate lens for a record
-to   |          | transform a normal function into a Lens
-view | ^.       | simple getter
-Maybe view | ^?       | getter wrapped in Maybe, or get me Maybe
-ix |        | get element at in a list
-          </textarea>
-        </section>
-
-        <section data-markdown>
-          <textarea data-template>
-### set/setter
-
-  - We can use lens also to set value in a record
-
-```Haskell
-set consulPort 9999 disco
-> ConsulDiscovery {_consulHost = ..., _consulPort = 9999, ...}
-# OR
-disco & consulPort .~ 9999
-> ConsulDiscovery {_consulHost = ..., _consulPort = 9999, ...}
-```
-<!-- .element: class="fragment" data-fragment-index="1" -->
-
-  - A setter return the whole structure, so it can be chained
-  <!-- .element: class="fragment" data-fragment-index="2" -->
-
-```Haskell
-disco & consulPort .~ 9999
-      & consulTimeout .~ 0
-> ConsulDiscovery {_consulHost = ..., _consulPort = 9999, _consulTimeout = 0, ...}
-
-disco & consulPort .~ 9999
-      & consulTimeout .~ 0
-      & consulHost . ix 0 .~ "localhost"
-> ConsulDiscovery {_consulHost = ["localhost", "consul2.criteo.prod"], _consulPort = 9999, _consulTimeout = 0, ...}
-```
-<!-- .element: class="fragment" data-fragment-index="3" -->
-          </textarea>
-        </section>
-        <section data-markdown>
-          <textarea data-template>
-### Modifier/Over
-
-  - Modifier are just setter which takes current value as argument
-
-```Haskell
-over consulPort (+1) disco
-> ConsulDiscovery {_consulHost = ..., _consulPort = 8051, ...}
-# OR
-disco & consulPort %~ (+1)
-> ConsulDiscovery {_consulHost = ..., _consulPort = 8051, ...}
-```
-<!-- .element: class="fragment" data-fragment-index="1" -->
-
-  - A setter return the whole structure, so it can be chained
-  <!-- .element: class="fragment" data-fragment-index="2" -->
-
-```Haskell
-disco & consulPort %~ (+1)
-& consulTimeout %~ \t -> if t == 0 then 10 else t
-> ConsulDiscovery {_consulHost = ..., _consulPort = 9999, _consulTimeout = 10, ...}
-
-disco & consulHost . ix 0 %~ T.toUpper
-> ConsulDiscovery {_consulHost = ["CONSUL.CRITEO.PROD", "consul2.criteo.prod"], ...}
-```
-<!-- .element: class="fragment" data-fragment-index="3" -->
-          </textarea>
-        </section>
-
-        <section data-markdown>
-          <textarea data-template>
-### What have we seen so far
-
-Name | Operator | Description
------|----------|------------
-makeLenses |    | auto-generate lens for a record
-to   |          | transform a normal function into a Lens
-view | ^.       | simple getter
-     | ^?       | getter wrapped in Maybe, or get me Maybe
-ix |        | get element at in a list
-set | .~        | set/replace the value of what the lens target
-over | %~       | modify a value by taking the current one as argument
-          </textarea>
-        </section>
-        <section data-markdown>
-          <textarea data-template>
-### Folds/Traversal
-
-  - It is possible to apply a function to every element and turn it into a list
-
-```Haskell
-toListOf (consulTimeout <> consulPort) disco
-> [10,8500]
-# OR
-disco ^.. (consulTimeout <> consulPort)
-> [10,8500]
-```
-<!-- .element: class="fragment" data-fragment-index="1" -->
-```Haskell
-let motto = "go go go" :: Text
-motto ^.. each . to (\c -> if c == 'g' then 'G' else c)
-> "Go Go Go"
-```
-<!-- .element: class="fragment" data-fragment-index="2" -->
-```Haskell
-# Look imperative style !
-forOf each ["talk.cabal", "src/Main.hs"] $ \path -> do
-  readFile path
-
-> [<fileOne>, <fileTwo>]
-```
-<!-- .element: class="fragment" data-fragment-index="3" -->
-
-  - As Lens is generic over many types, it let you generalize function (map, filter, ...)
-  <!-- .element: class="fragment" data-fragment-index="4" -->
-          </textarea>
-        </section>
-
-        <section data-markdown>
-          <textarea data-template>
-### Prism
-
-  - They are just a pattern match of a Sum Type
-
-```Haskell
-data Maybe a = Just a | Nothing
-[Just "a", Just "b", Nothing] ^.. each . _Just
-> ["a","b"]
-
-[Just "a", Just "b", Nothing] ^.. each . _Nothing
-> [()]
-```
-<!-- .element: class="fragment" data-fragment-index="1" -->
-
-```Haskell
-[Just "a", Just "b", Nothing] ^.. each . filtered (has _Just)
-> [Just "a",Just "b"]
-```
-<!-- .element: class="fragment" data-fragment-index="2" -->
-
-  - And many more <!-- .element: class="fragment" data-fragment-index="3" -->
-    - [Microlens](https://hackage.haskell.org/package/microlens-0.4.8.1/docs/Lens-Micro.html)
-    - [Lens tutorial](https://hackage.haskell.org/package/lens-tutorial-1.0.3/docs/Control-Lens-Tutorial.html)
-          </textarea>
-        </section>
-
-        <section data-markdown>
-          <textarea data-template>
-### What have we seen so far
-
-Name | Operator | Description
------|----------|------------
-makeLenses |    | auto-generate lens for a record
-to   |          | transform a normal function into a Lens
-view | ^.       | simple getter
-     | ^?       | getter wrapped in Maybe, or get me Maybe
-ix |        | get element at in a list
-set | .~        | set/replace the value of what the lens target
-over | %~       | modify a value by taking the current one as argument
-toListOf | ^..       | return a list of all values returned
-each |        | target every element of a traversable
-prism |       | Lens that pattern match over a sum type
-          </textarea>
-        </section>
-
-        <section data-markdown>
-          <textarea data-template>
-### Lens & ReaderT Pattern
-
-  - ReaderT Pattern is a design advertised by
-    - [Fpcomplete](https://www.fpcomplete.com/blog/2017/06/readert-design-pattern)
-    - [Free monad considered harmful](https://markkarpov.com/post/free-monad-considered-harmful.html)
-
-  - TL;DR
-    - FreeMonads are slows
-    - Heavy stack of Monad Transformers are bloated
-    - Just use ReaderT, it is optimized, it is fast
-
-  - Lens can help you
-          </textarea>
-        </section>
-
-        <section data-markdown>
-          <textarea data-template>
-### Lens & ReaderT pattern
-
-```Haskell
-data ConsulDiscovery = ConsulDiscovery
-  { _consulHost            :: [Text]
-  , _consulPort            :: Int
-  , _consulTimeout         :: Int
-  , _consulReadConsistency :: Text
-  } deriving (Show)
-
-data AppConfig = AppConfig
-  { _cfg :: Text
-  } deriving (Show)
-
-data Config = Config
-  { configDiscovery  :: ConsulDiscovery
-  , configApp  :: AppConfig
-  } deriving (Show)
-```
-```Haskell
-doWork :: (MonadIO m, MonadReader Config m) => [Text] -> m ()
-doWork services = do
-  cfg <- ask
-  liftIO $ print cfg
-  return ()
-
-doDiscovery :: (MonadIO m, MonadReader Config m) => m [Text]
-doDiscovery = do
-  cfg <- ask
-  liftIO $ print cfg
-  return ["toto", "tata"]
-
-runApp :: (MonadIO m, MonadReader Config m) => m ()
-runApp = do
-  liftIO $ print "runApp"
-  hosts <- doDiscovery
-  doWork hosts
-  return ()
-
-main :: IO ()
-main = do
-  let foo = Config (ConsulDiscovery ["toto.service.io"] 10 0 "toto") (AppConfig "Haskell Meetup")
-  _ <- runReaderT runApp foo
-  return ()
-```
-          </textarea>
-        </section>
-
-        <section data-markdown>
-          <textarea data-template>
-### Lens & ReaderT pattern
-
-```Haskell
-data ConsulDiscovery = ConsulDiscovery
-  { _consulHost            :: [Text]
-  , _consulPort            :: Int
-  , _consulTimeout         :: Int
-  , _consulReadConsistency :: Text
-  } deriving (Show)
-
-
-data AppConfig = AppConfig
-  { _cfg :: Text
-  } deriving (Show)
-
-data Config = Config
-  { configDiscovery  :: ConsulDiscovery
-  , configApp  :: AppConfig
-  } deriving (Show)
-
-makeLensesWith camelCaseFields ''Config
-```
-
-```Haskell
-doWork :: (MonadIO m, MonadReader env m, HasApp env AppConfig) => [Text] -> m ()
-doWork services = do
-  cfg <- ask
-  liftIO $ print $ cfg ^. app
-  return ()
-
-doDiscovery :: (MonadIO m, MonadReader env m, HasDiscovery env ConsulDiscovery) => m [Text]
-doDiscovery = do
-  cfg <- ask
-  liftIO $ print $ cfg ^. discovery
-  return ["toto", "tata"]
-
-runApp :: (MonadIO m, MonadReader Config m) => m ()
-runApp = do
-  liftIO $ print "runApp"
-  hosts <- doDiscovery
-  doWork hosts
-
-main :: IO ()
-main = do
-  let cfg = Config (ConsulDiscovery ["toto.service.io"] 10 0 "toto") (AppConfig "Haskell Meetup")
-  _ <- runReaderT runApp cfg
-  return ()
-
-```
-          </textarea>
-        </section>
-
-        <section data-markdown>
-          <textarea data-template>
-            ### End, at last !
-
-            - I hope
-              - Lens get less scary for all of us
-              - You will try to use it in your projects
-              - If you write a library make an extension for it
-
-            - Records are broken but Lens are still not idiomatic
-              - You have to make a willing effort to use them
-              - Reward at the end of the path
-
-            - Give a shot to lens-aeson !
-          </textarea>
-        </section>
 			</div>
 		</div>
 
