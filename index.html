@@ -28,7 +28,6 @@
 
         <section data-markdown>
           <textarea data-template>
-
             # Haskell Paris
             ### How to start learning haskell
 
@@ -49,7 +48,8 @@
             * To see something different ?
             * To atteign enlightment ?
 
-            Be ware of your motivations in order to not lost it half-way
+            Be aware of your motivations in order to not lost it half-way
+            Haskell is flawed, don't expect perfection
 
           </textarea>
         </section>
@@ -69,6 +69,8 @@
             * Groups targeting the industry
               * FpComplete - Well-Typed - Tweag I/O
             * People just wanting to learn it
+              * Avoid posting on Hackage if you will not maintain it
+            * Feeling that you never learned enough - that you are still missing
           </textarea>
         </section>
 
@@ -82,13 +84,14 @@
               * What I Wish I Knew When Learning Haskell
 
             * Language has a lot of quirks
-              * Strings/ByteString/Text and all Lazy variants
+              * Strings/ByteString/Text and all lazy variants
               * Freaking number of extensions (Hello mandatory ScopedTypeVariables)
-              * Prelude is a bad STL - pick protolude
+              * Prelude is an unsafe STL - pick protolude
 
             * Conflicting styles
               * MTL vs Free Monads
               * Let's make everything a funky operator
+              * Typeclass everywhere !
               * Dependent Types
               * Lens
           </textarea>
@@ -112,16 +115,38 @@
           <textarea data-template>
             ### Practical Advises
 
-            * You have to understand it
-              * Be ready to be masochist and bang your head on it
-            * It add an other layer of lecture - Types
-              * Code can make no sense if you don't understand its types
-              * You have to know Haskell basic type hierarchie (Monoid/Foldable/Traversable/Applicative/Monad)
-            * It can feel hard without necessity
-              * You start to appreciate it when you master it
+            - Don't try to read other people code at first - learn from books
+              * Haskell Book - Haskell programming from first principles
+              * Haskell Wiki Book - https://en.wikibooks.org/wiki/Haskell
+              * What I Wish I Knew When Learning Haskell
+
+            - Play within a repl and try to do some coding challenges
+              * repl.it
+              * www.codewars.com
+
+            - Learn to read types, to be at ease with the docs
+
+            - Understand basic type hierarchy
+              * IO - Maybe/Either - SemiGroup - Monoid - Foldable - Traversable - Applicative - Monad
+
+            - Start a pet project
+              * Use Stack - docs.haskellstack.org
+              * Use only librairies that are in Stackage LTS - www.stackage.org
+              * Use Atom or Visual Code, they have good plugin for Haskell
+              * Use Protolude instead of Prelude as STL
           </textarea>
         </section>
 
+        <section data-markdown>
+          <textarea data-template>
+            ### Remember your initial motivation(s)
+
+            * It is normal to feel overwhelmed even after a long period of time
+            * Take pleasure solving problems in a different way
+            * It will take time, so enjoy Haskell as an atelic activity at first
+            * Take time to step back and mesure your growth
+          </textarea>
+        </section>
 			</div>
 		</div>
 
